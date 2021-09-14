@@ -72,7 +72,15 @@ async function getAreaNamesType2(cityName: string) {
 
     await axios.get(wikipediaRoot + href).then(({ data }) => {
       const $ = cheerio.load(data);
-      const $table = $('table.wikitable.sortable').first();
+
+      const $table = $('#행정_구역')
+        .parents('h2')
+        .nextAll()
+        .filter(function () {
+          return this.tagName.toLowerCase() == 'table';
+        })
+        .first();
+
       const titles = $table.find('td b a').toArray();
 
       if (!titles.length) {
@@ -82,6 +90,10 @@ async function getAreaNamesType2(cityName: string) {
       for (const aTag of titles) {
         const $a = $(aTag);
         const secondRegionName = $a.text().trim();
+
+        if (secondRegionName == '행정동') {
+          continue;
+        }
 
         areaNames.push(
           `${cityName} ${regionName} ${secondRegionName}`
@@ -101,6 +113,7 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType1('부산광역시'),
 
     getAreaNamesType2('대구광역시'),
+    getAreaNamesType2('인천광역시'),
   ];
 
   const areaNames = [...new Set(flat(await Promise.all(promises)))];
