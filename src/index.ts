@@ -2,17 +2,23 @@ import flat from 'array.prototype.flat';
 import axios from 'axios';
 import cheerio, { Cheerio, Element } from 'cheerio';
 
+const wikipediaRoot = 'https://ko.wikipedia.org';
+
+async function loadCityWiki(cityName: string) {
+  const { data } = await axios.get(
+    `${wikipediaRoot}/wiki/${encodeURI(`${cityName}의_행정_구역`)}`
+  );
+
+  return cheerio.load(data);
+}
+
 /**
- * 유형 1
+ * 크롤링 유형 1
  *
  * 서울특별시, 부산광역시
  */
 async function getAreaNamesType1(cityName: string) {
-  const { data } = await axios.get(
-    `https://ko.wikipedia.org/wiki/${encodeURI(`${cityName}의_행정_구역`)}`
-  );
-
-  const $ = cheerio.load(data);
+  const $ = await loadCityWiki(cityName);
   const regionTitles = $('h3')
     .filter(function () {
       const headlineText = $(this).find('.mw-headline').text().trim();
@@ -48,13 +54,56 @@ async function getAreaNamesType1(cityName: string) {
   return areaNames;
 }
 
-(async () => {
-  const areaNames = flat(
-    await Promise.all([
-      getAreaNamesType1('서울특별시'),
-      getAreaNamesType1('부산광역시'),
-    ])
-  );
+/**
+ * 크롤링 유형 2
+ *
+ * 대구광역시
+ */
+async function getAreaNamesType2(cityName: string) {
+  const $ = await loadCityWiki(cityName);
+  const areaNames: string[] = [];
+  const $table = $('table.wikitable').first();
+  const titles = $table.find('td b a').toArray();
 
-  console.log(areaNames);
+  for (const aTag of titles) {
+    const $a = $(aTag);
+    const regionName = $a.text().trim();
+    const href = $a.prop('href');
+
+    await axios.get(wikipediaRoot + href).then(({ data }) => {
+      const $ = cheerio.load(data);
+      const $table = $('table.wikitable.sortable').first();
+      const titles = $table.find('td b a').toArray();
+
+      if (!titles.length) {
+        console.warn(`no titles.length : ${regionName}`);
+      }
+
+      for (const aTag of titles) {
+        const $a = $(aTag);
+        const secondRegionName = $a.text().trim();
+
+        areaNames.push(
+          `${cityName} ${regionName} ${secondRegionName}`
+            .trim()
+            .replace(/\s{2,}/g, ' ')
+        );
+      }
+    });
+  }
+
+  return areaNames;
+}
+
+(async () => {
+  const promises = [
+    getAreaNamesType1('서울특별시'),
+    getAreaNamesType1('부산광역시'),
+
+    getAreaNamesType2('대구광역시'),
+  ];
+
+  const areaNames = [...new Set(flat(await Promise.all(promises)))];
+
+  console.log(areaNames.length, areaNames.slice(-10));
 })();
