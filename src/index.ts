@@ -119,6 +119,7 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('대구광역시'),
     getAreaNamesType2('인천광역시'),
     getAreaNamesType2('광주광역시'),
+    getAreaNamesType2('대전광역시'),
   ];
 
   const areaNames = [...new Set(flat(await Promise.all(promises)))];
