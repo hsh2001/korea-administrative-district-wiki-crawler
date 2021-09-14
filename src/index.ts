@@ -120,6 +120,8 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('강원도'),
     getAreaNamesType2('충청북도'),
     getAreaNamesType2('충청남도'),
+    getAreaNamesType2('전라남도'),
+    getAreaNamesType2('전라북도'),
   ];
 
   const areaNames = [
