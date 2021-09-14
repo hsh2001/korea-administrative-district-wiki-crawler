@@ -75,8 +75,11 @@ async function getAreaNamesType2(cityName: string) {
     await axios.get(wikipediaRoot + href).then(({ data }) => {
       const $ = cheerio.load(data);
 
-      const $table = $('#행정_구역, #행정구역, #행정_구역_및_인구')
-        .parents('h2')
+      const $table = $(
+        '#행정_구역, #행정구역, #행정_구역_및_인구, #행정_구역과_인구'
+      )
+        .parents('h2, h3')
+        .first()
         .nextAll()
         .filter(function () {
           return this.tagName.toLowerCase() == 'table';
@@ -122,6 +125,8 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('충청남도'),
     getAreaNamesType2('전라남도'),
     getAreaNamesType2('전라북도'),
+    getAreaNamesType2('경상남도'),
+    getAreaNamesType2('경상북도'),
   ];
 
   const areaNames = [
