@@ -129,6 +129,39 @@ async function getAreaNamesTypeJeju(cityName: '서귀포시' | '제주시') {
   return areaNames;
 }
 
+/**
+ * 크롤링 유형 울산
+ */
+async function getAreaNameOnUlsan() {
+  const $ = await loadCityWiki('울산광역시');
+
+  return flat(
+    $('table')
+      .filter(function () {
+        return $(this).find('img').length != 0;
+      })
+      .toArray()
+      .map((table) => {
+        const $table = $(table);
+        const regionName = $table
+          .find('tr:last-child b')
+          .text()
+          .trim()
+          .replace('울산', '');
+
+        if (!regionName) {
+          return [];
+        }
+
+        return $table
+          .find('td b a')
+          .toArray()
+          .map((aTag) => {
+            return `울산광역시 ${regionName} ${$(aTag).text().trim()}`;
+          });
+      })
+  );
+}
 (async () => {
   const promises = [
     getAreaNamesType1('서울특별시'),
@@ -149,6 +182,8 @@ async function getAreaNamesTypeJeju(cityName: '서귀포시' | '제주시') {
 
     getAreaNamesTypeJeju('서귀포시'),
     getAreaNamesTypeJeju('제주시'),
+
+    getAreaNameOnUlsan(),
   ];
 
   const areaNames = [
