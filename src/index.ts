@@ -14,8 +14,6 @@ async function loadCityWiki(cityName: string) {
 
 /**
  * 크롤링 유형 1
- *
- * 서울특별시, 부산광역시
  */
 async function getAreaNamesType1(cityName: string) {
   const $ = await loadCityWiki(cityName);
@@ -58,8 +56,6 @@ async function getAreaNamesType1(cityName: string) {
 
 /**
  * 크롤링 유형 2
- *
- * 대구광역시
  */
 async function getAreaNamesType2(cityName: string) {
   const $ = await loadCityWiki(cityName);
@@ -110,6 +106,29 @@ async function getAreaNamesType2(cityName: string) {
   return areaNames;
 }
 
+/**
+ * 크롤링 유형 제주
+ */
+async function getAreaNamesTypeJeju(cityName: '서귀포시' | '제주시') {
+  const $ = await loadCityWiki(cityName);
+  const areaNames = $('#행정_구역')
+    .parents('h2')
+    .nextAll()
+    .filter(function () {
+      return this.tagName.toLowerCase() == 'table';
+    })
+    .first()
+    .find('tbody td b a')
+    .toArray()
+    .map((aTag) => {
+      return `제주특별자치도 ${cityName} ${$(aTag).text().trim()}`;
+    });
+
+  console.warn(`${cityName} has ${areaNames.length || 'no'} areaNames`);
+
+  return areaNames;
+}
+
 (async () => {
   const promises = [
     getAreaNamesType1('서울특별시'),
@@ -127,6 +146,9 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('전라북도'),
     getAreaNamesType2('경상남도'),
     getAreaNamesType2('경상북도'),
+
+    getAreaNamesTypeJeju('서귀포시'),
+    getAreaNamesTypeJeju('제주시'),
   ];
 
   const areaNames = [
