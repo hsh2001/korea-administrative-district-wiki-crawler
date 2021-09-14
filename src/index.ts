@@ -51,6 +51,8 @@ async function getAreaNamesType1(cityName: string) {
     processDlTag($dl);
   }
 
+  console.warn(`${cityName} has ${areaNames.length || 'no'} areaNames`);
+
   return areaNames;
 }
 
@@ -62,7 +64,7 @@ async function getAreaNamesType1(cityName: string) {
 async function getAreaNamesType2(cityName: string) {
   const $ = await loadCityWiki(cityName);
   const areaNames: string[] = [];
-  const $table = $('table.wikitable').first();
+  const $table = $('table.wikitable.sortable').first();
   const titles = $table.find('td b a').toArray();
 
   for (const aTag of titles) {
@@ -104,6 +106,8 @@ async function getAreaNamesType2(cityName: string) {
     });
   }
 
+  console.warn(`${cityName} has ${areaNames.length || 'no'} areaNames`);
+
   return areaNames;
 }
 
@@ -114,6 +118,7 @@ async function getAreaNamesType2(cityName: string) {
 
     getAreaNamesType2('대구광역시'),
     getAreaNamesType2('인천광역시'),
+    getAreaNamesType2('광주광역시'),
   ];
 
   const areaNames = [...new Set(flat(await Promise.all(promises)))];
