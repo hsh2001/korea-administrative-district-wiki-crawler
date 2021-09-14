@@ -162,6 +162,19 @@ async function getAreaNameOnUlsan() {
       })
   );
 }
+
+/**
+ * 크롤링 유형 세종
+ */
+async function getAreaNameOnSejong() {
+  const $ = await loadCityWiki('세종특별자치시');
+  return $('table.wikitable.sortable tbody')
+    .first()
+    .find('tr b a')
+    .toArray()
+    .map((aTag) => `세종특별자치시 ${$(aTag).text().trim()}`);
+}
+
 (async () => {
   const promises = [
     getAreaNamesType1('서울특별시'),
@@ -184,6 +197,8 @@ async function getAreaNameOnUlsan() {
     getAreaNamesTypeJeju('제주시'),
 
     getAreaNameOnUlsan(),
+
+    getAreaNameOnSejong(),
   ];
 
   const areaNames = [
