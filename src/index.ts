@@ -83,7 +83,7 @@ async function getAreaNamesType2(cityName: string) {
         })
         .first();
 
-      const titles = $table.find('td b a, th a[title]').toArray();
+      const titles = $table.find('td a[title], th a[title]').toArray();
 
       if (!titles.length) {
         console.warn(`no titles.length : ${regionName}`);
@@ -97,11 +97,7 @@ async function getAreaNamesType2(cityName: string) {
           continue;
         }
 
-        areaNames.push(
-          `${cityName} ${regionName} ${secondRegionName}`
-            .trim()
-            .replace(/\s{2,}/g, ' ')
-        );
+        areaNames.push(`${cityName} ${regionName} ${secondRegionName}`);
       }
     });
   }
@@ -121,9 +117,16 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('광주광역시'),
     getAreaNamesType2('대전광역시'),
     getAreaNamesType2('경기도'),
+    getAreaNamesType2('강원도'),
   ];
 
-  const areaNames = [...new Set(flat(await Promise.all(promises)))];
+  const areaNames = [
+    ...new Set(
+      flat(await Promise.all(promises)).map((s) =>
+        s.trim().replace(/\s{2,}/g, ' ')
+      )
+    ),
+  ];
 
   console.log(areaNames.length, areaNames.slice(-10));
 })();
