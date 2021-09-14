@@ -118,6 +118,7 @@ async function getAreaNamesType2(cityName: string) {
     getAreaNamesType2('대전광역시'),
     getAreaNamesType2('경기도'),
     getAreaNamesType2('강원도'),
+    getAreaNamesType2('충청북도'),
   ];
 
   const areaNames = [
