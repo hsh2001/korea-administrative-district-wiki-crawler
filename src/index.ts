@@ -1,6 +1,12 @@
+import flat from 'array.prototype.flat';
 import axios from 'axios';
 import cheerio, { Cheerio, Element } from 'cheerio';
 
+/**
+ * 유형 1
+ *
+ * 서울특별시, 부산광역시
+ */
 async function getAreaNamesType1(cityName: string) {
   const { data } = await axios.get(
     `https://ko.wikipedia.org/wiki/${encodeURI(`${cityName}의_행정_구역`)}`
@@ -20,8 +26,7 @@ async function getAreaNamesType1(cityName: string) {
     const $h3 = $(h3);
     const $dl = $h3.next();
 
-    processDlTag($dl);
-    function processDlTag($dl: Cheerio<Element>) {
+    const processDlTag = ($dl: Cheerio<Element>) => {
       if ($dl[0]?.tagName?.toLowerCase() != 'dl') {
         return;
       }
@@ -35,17 +40,21 @@ async function getAreaNamesType1(cityName: string) {
 
       areaNames.push(...dongList);
       processDlTag($dl.next());
-    }
+    };
+
+    processDlTag($dl);
   }
 
   return areaNames;
 }
 
 (async () => {
-  const areaNames = [
-    ...(await getAreaNamesType1('서울특별시')),
-    ...(await getAreaNamesType1('부산광역시')),
-  ];
+  const areaNames = flat(
+    await Promise.all([
+      getAreaNamesType1('서울특별시'),
+      getAreaNamesType1('부산광역시'),
+    ])
+  );
 
   console.log(areaNames);
 })();
