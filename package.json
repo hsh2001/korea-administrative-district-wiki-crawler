@@ -22,7 +22,7 @@
     "@typescript-eslint/eslint-plugin": "4.29.3",
     "@typescript-eslint/parser": "4.29.3",
     "eslint": "7.32.0",
-    "eslint-config-prettier": "6.15.0",
+    "eslint-config-prettier": "8.10.0",
     "eslint-plugin-eslint-comments": "3.2.0",
     "eslint-plugin-import": "2.24.1",
     "gh-pages": "3.1.0",
